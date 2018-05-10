@@ -16,7 +16,7 @@ public class RedisService {
     JedisPool jedisPool;
 
     /**
-     * 返回到连接池
+     * 关闭jedis
      * @param jedis
      */
     private void returnToPool(Jedis jedis){
@@ -71,14 +71,16 @@ public class RedisService {
      * @param <T>
      * @return
      */
-    public <T> T get(String key,Class<T> clazz){
+    public <T> T get(KeyPrefix prefix,String key,Class<T> clazz){
         Jedis jedis = null;
-        try{
+        try {
             //通过JedisPool资源池管理Jedis连接
-            jedis = jedisPool.getResource();
-            String str = jedis.get(key);
+            jedis =  jedisPool.getResource();
+            //生成真正的key
+            String realKey  = prefix.getPrefix() + key;
+            String  str = jedis.get(realKey);
             //将字符串转换成Bean对象
-            T t = stringToBean(str,clazz);
+            T t =  stringToBean(str, clazz);
             return t;
         }finally {
             returnToPool(jedis);
@@ -92,16 +94,83 @@ public class RedisService {
      * @param <T>
      * @return
      */
-    public <T> boolean set(String key,T value){
+    public <T> boolean set(KeyPrefix prefix,String key,T value){
         Jedis jedis = null;
-        try{
-            jedis = jedisPool.getResource();
+        try {
+            jedis =  jedisPool.getResource();
             //将Bean对象转换成字符串对象
             String str = beanToString(value);
-            jedis.set(key,str);
+            if(str == null || str.length() <= 0) {
+                return false;
+            }
+            //生成真正的key
+            String realKey  = prefix.getPrefix() + key;
+            int seconds =  prefix.expireSeconds();  //获取过期时间
+            if(seconds <= 0) { //key不过期
+                jedis.set(realKey, str);
+            }else {            //设置key的过期时间为seconds秒
+                jedis.setex(realKey, seconds, str);
+            }
             return true;
         }finally {
             returnToPool(jedis);
         }
     }
+
+    /**
+     * 判断key是否存在
+     * @param prefix
+     * @param key
+     * @param <T>
+     * @return
+     */
+    public <T> boolean exists(KeyPrefix prefix,String key){
+        Jedis jedis = null;
+        try{
+            jedis = jedisPool.getResource();
+            String realKey = prefix.getPrefix() + key;
+            return jedis.exists(realKey);
+        }finally {
+            returnToPool(jedis);
+        }
+    }
+
+    /**
+     * 将key中储存的数字值增1
+     * @param prefix
+     * @param key
+     * @param <T>
+     * @return
+     */
+    public <T> Long incr(KeyPrefix prefix,String key){
+        Jedis jedis = null;
+        try{
+            jedis = jedisPool.getResource();
+            String realKey = prefix.getPrefix() + key;
+            //将realKey中存储的数字值增1
+            //如果realKey不存在，那么realKey的值会先被初始化为0 ，然后再执行incr操作
+            return jedis.incr(realKey);
+        }finally {
+            returnToPool(jedis);
+        }
+    }
+
+    /**
+     * 将key中储存的数字值减1
+     * @param prefix
+     * @param key
+     * @param <T>
+     * @return
+     */
+    public <T> Long decr(KeyPrefix prefix,String key){
+        Jedis jedis = null;
+        try{
+            jedis = jedisPool.getResource();
+            String realKey = prefix.getPrefix() + key;
+            return jedis.decr(realKey);
+        }finally {
+            returnToPool(jedis);
+        }
+    }
+
 }
