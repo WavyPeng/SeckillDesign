@@ -1,0 +1,1 @@
+A design for seckill by Java
