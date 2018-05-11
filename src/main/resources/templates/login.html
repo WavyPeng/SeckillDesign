@@ -54,6 +54,47 @@
         </form>
     </body>
     <script>
+        <!-- 登录功能 -->
+        function login() {
+            <!-- 利用jquey-validation做验证 -->
+            $("#loginForm").validate({
+                submitHandler:function(form){
+                    doLogin();
+                }
+            });
+        }
+        function doLogin(){
+            //展示一个loading框
+            g_showLoading();
 
+            //对用户的明文密码进行加密
+            var pass = $("#password").val();
+            var salt = g_passsword_salt;
+            var str = pass + salt;
+            var password = md5(str);
+
+            $.ajax({
+                url:"/user/do_login",
+                type:"post",
+                data:{
+                    mobile:$("#mobile").val(),
+                    password:password
+                },
+                success:function (data) {
+                    //将弹框关闭
+                    layer.closeAll();
+                    console.log(data);
+                    //登录成功
+                    if(data.code == 0){
+                        layer.msg("登录成功！");
+                    }else{
+                        layer.msg(data.msg);
+                    }
+                },
+                error:function () {
+                    layer.closeAll();
+                }
+            });
+        }
     </script>
 </html>

@@ -6,13 +6,13 @@ import java.sql.Timestamp;
  * Created by WavyPeng on 2018/5/10.
  */
 public class User {
-    long id;
-    String nickname;
-    String password;
-    String salt;
-    Timestamp register_date;
-    Timestamp last_login_date;
-    int login_count;
+    private long id;
+    private String nickname;
+    private String password;
+    private String salt;
+    private Timestamp register_date;
+    private Timestamp last_login_date;
+    private int login_count;
 
     public User(long id, String nickname, String password, String salt, Timestamp register_date,
                 Timestamp last_login_date, int login_count) {
