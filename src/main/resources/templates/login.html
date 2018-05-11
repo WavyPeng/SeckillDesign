@@ -83,10 +83,10 @@
                 success:function (data) {
                     //将弹框关闭
                     layer.closeAll();
-                    console.log(data);
                     //登录成功
                     if(data.code == 0){
                         layer.msg("登录成功！");
+                        window.location.href="/goods/to_list";
                     }else{
                         layer.msg(data.msg);
                     }

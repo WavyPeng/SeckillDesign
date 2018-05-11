@@ -7,7 +7,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * 相关校验
+ * 校验工具类
  * Created by WavyPeng on 2018/5/10.
  */
 @Slf4j

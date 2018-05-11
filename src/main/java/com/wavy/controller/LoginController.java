@@ -9,6 +9,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 /**
@@ -36,10 +37,9 @@ public class LoginController {
      */
     @RequestMapping("/do_login")
     @ResponseBody
-    public Result<Boolean> doLogin(@Valid LoginVo loginVo){
-        log.info("{}",loginVo);
+    public Result<Boolean> doLogin(HttpServletResponse response,@Valid LoginVo loginVo){
         // 登录
-        userService.login(loginVo);
+        userService.login(response,loginVo);
 
         // 异常交给全局异常处理器进行处理
         // 因此这里成功将直接返回

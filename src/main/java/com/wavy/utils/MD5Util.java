@@ -4,7 +4,7 @@ package com.wavy.utils;
 import org.apache.commons.codec.digest.DigestUtils;
 
 /**
- * MD5加密
+ * MD5加密工具类
  * Created by WavyPeng on 2018/5/10.
  */
 public class MD5Util {

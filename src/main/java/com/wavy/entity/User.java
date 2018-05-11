@@ -14,6 +14,9 @@ public class User {
     private Timestamp last_login_date;
     private int login_count;
 
+    public User(){
+    }
+
     public User(long id, String nickname, String password, String salt, Timestamp register_date,
                 Timestamp last_login_date, int login_count) {
         this.id = id;
