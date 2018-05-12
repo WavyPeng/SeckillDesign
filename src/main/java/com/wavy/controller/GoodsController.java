@@ -46,7 +46,7 @@ public class GoodsController {
                          @PathVariable("goodsId")long goodsId){
         model.addAttribute("user",user);
         //获取商品详细信息
-        GoodsVo goods = goodsService.getGoodsVoByGoodsId();
+        GoodsVo goods = goodsService.getGoodsVoByGoodsId(goodsId);
         model.addAttribute("goods",goods);
 
         //判断商品是否处于秒杀阶段
@@ -61,10 +61,11 @@ public class GoodsController {
 
         if(now < startTime){        //秒杀还未开始，倒计时进行中
             seckill_status = 0;
-            remain_time = (int)((now - startTime)/1000);
-        }else if(now > startTime){  //秒杀结束
+            remain_time = (int)((startTime - now)/1000);
+        }else if(now > endTime){  //秒杀结束
             seckill_status = 2;
             remain_time = -1;
+            log.info("status:{}","进行中");
         }else {                     //秒杀进行中
             seckill_status = 1;
             remain_time = 0;

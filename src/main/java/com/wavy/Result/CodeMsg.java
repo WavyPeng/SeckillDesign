@@ -23,6 +23,10 @@ public class CodeMsg {
     public static CodeMsg PASSWORD_ERROR = new CodeMsg(500214, "密码错误");
     public static CodeMsg SESSION_ERROR = new CodeMsg(500215, "Session不存在或者已经失效");
 
+    //秒杀模块 5003XX
+    public static CodeMsg SECKILL_OVER = new CodeMsg(500300,"商品被其他小伙伴秒杀完了");
+    public static CodeMsg SECKILL_REPEAT = new CodeMsg(500301,"不能重复秒杀");
+    public static CodeMsg SECKILL_FAIL = new CodeMsg(500302,"秒杀失败");
 
 
     private CodeMsg(){
