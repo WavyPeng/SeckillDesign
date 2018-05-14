@@ -35,7 +35,38 @@ public class UserService {
      * @return
      */
     public User getById(long id){
-        return userDao.getById(id);
+        // ---- 添加对象缓存 ----
+        // 取缓存
+        User user = redisService.get(UserKey.cacheToken,""+id,User.class);
+        if(user!=null){
+            return user;
+        }
+        // 取数据库
+        user = userDao.getById(id);
+        if(user != null){
+            //存入缓存
+            redisService.set(UserKey.cacheToken,""+id,user);
+        }
+        return user;
+    }
+
+    // http://blog.csdn.net/tTU1EvLDeLFq5btqiK/article/details/78693323
+    public boolean updatePassword(String token, long id, String formPass) {
+        //取user
+        User user = getById(id);
+        if(user == null) {
+            throw new GlobalException(CodeMsg.MOBILE_NOT_EXIST);
+        }
+        //更新数据库
+        User toBeUpdate = new User();
+        toBeUpdate.setId(id);
+        toBeUpdate.setPassword(MD5Util.formPassToDbPass(formPass, user.getSalt()));
+        userDao.update(toBeUpdate);
+        //处理缓存
+        redisService.delete(UserKey.cacheToken, ""+id);
+        user.setPassword(toBeUpdate.getPassword());
+        redisService.set(UserKey.token, token, user);
+        return true;
     }
 
     /**
