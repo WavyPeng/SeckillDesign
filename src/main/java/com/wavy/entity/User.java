@@ -1,6 +1,7 @@
 package com.wavy.entity;
 
 import java.sql.Timestamp;
+import java.util.Date;
 
 /**
  * Created by WavyPeng on 2018/5/10.
@@ -10,8 +11,8 @@ public class User {
     private String nickname;
     private String password;
     private String salt;
-    private Timestamp register_date;
-    private Timestamp last_login_date;
+    private Date register_date;
+    private Date last_login_date;
     private int login_count;
 
     public User(){
@@ -60,19 +61,19 @@ public class User {
         this.salt = salt;
     }
 
-    public Timestamp getRegister_date() {
+    public Date getRegister_date() {
         return register_date;
     }
 
-    public void setRegister_date(Timestamp register_date) {
+    public void setRegister_date(Date register_date) {
         this.register_date = register_date;
     }
 
-    public Timestamp getLast_login_date() {
+    public Date getLast_login_date() {
         return last_login_date;
     }
 
-    public void setLast_login_date(Timestamp last_login_date) {
+    public void setLast_login_date(Date last_login_date) {
         this.last_login_date = last_login_date;
     }
 

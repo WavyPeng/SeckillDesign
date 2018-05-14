@@ -68,7 +68,7 @@ public class UserService {
      * 登录
      * @param loginVo
      */
-    public boolean login(HttpServletResponse response, LoginVo loginVo) {
+    public String login(HttpServletResponse response, LoginVo loginVo) {
         if(loginVo == null)
             throw new GlobalException(CodeMsg.SERVER_ERROR);
         String mobile = loginVo.getMobile();
@@ -91,6 +91,6 @@ public class UserService {
         //生成Cookie
         String token = UUIDUtil.uuid();
         addCookie(response,token,user);
-        return true;
+        return token;
     }
 }

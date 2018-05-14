@@ -37,12 +37,12 @@ public class LoginController {
      */
     @RequestMapping("/do_login")
     @ResponseBody
-    public Result<Boolean> doLogin(HttpServletResponse response,@Valid LoginVo loginVo){
+    public Result<String> doLogin(HttpServletResponse response,@Valid LoginVo loginVo){
         // 登录
-        userService.login(response,loginVo);
+        String token = userService.login(response,loginVo);
 
         // 异常交给全局异常处理器进行处理
         // 因此这里成功将直接返回
-        return Result.success(true);
+        return Result.success(token);
     }
 }
