@@ -50,7 +50,13 @@ public class UserService {
         return user;
     }
 
-    // http://blog.csdn.net/tTU1EvLDeLFq5btqiK/article/details/78693323
+    /**
+     * 更新密码
+     * @param token
+     * @param id
+     * @param formPass
+     * @return
+     */
     public boolean updatePassword(String token, long id, String formPass) {
         //取user
         User user = getById(id);

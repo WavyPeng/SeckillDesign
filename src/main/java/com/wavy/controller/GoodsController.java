@@ -1,10 +1,12 @@
 package com.wavy.controller;
 
+import com.wavy.Result.Result;
 import com.wavy.entity.User;
 import com.wavy.redis.GoodsKey;
 import com.wavy.redis.RedisService;
 import com.wavy.service.GoodsService;
 import com.wavy.service.UserService;
+import com.wavy.vo.GoodsDetailVo;
 import com.wavy.vo.GoodsVo;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -129,5 +131,49 @@ public class GoodsController {
             redisService.set(GoodsKey.getGoodsDetail,""+goodsId,html);
         }
         return html;
+    }
+
+    /**
+     * 页面静态化处理商品详情页
+     * @return
+     */
+    @RequestMapping(value = "/static/to_detail/{goodsId}")
+    @ResponseBody
+    public Result<GoodsDetailVo> staticizeForDetail(HttpServletRequest request,HttpServletResponse response,
+                                                    Model model,User user,@PathVariable("goodsId")long goodsId){
+        //获取商品详细信息
+        GoodsVo goods = goodsService.getGoodsVoByGoodsId(goodsId);
+        model.addAttribute("goods",goods);
+
+        //判断商品是否处于秒杀阶段
+        long startTime = goods.getStartDate().getTime();
+        long endTime = goods.getEndDate().getTime();
+        long now = System.currentTimeMillis();
+
+        //秒杀状态
+        int seckill_status = 0;
+        //距离秒杀开始的时间
+        int remain_time = 0;
+
+        if(now < startTime){        //秒杀还未开始，倒计时进行中
+            seckill_status = 0;
+            remain_time = (int)((startTime - now)/1000);
+        }else if(now > endTime){  //秒杀结束
+            seckill_status = 2;
+            remain_time = -1;
+            log.info("status:{}","进行中");
+        }else {                     //秒杀进行中
+            seckill_status = 1;
+            remain_time = 0;
+        }
+
+        //存储要反馈的页面信息
+        GoodsDetailVo detailVo = new GoodsDetailVo();
+        detailVo.setGoods(goods);
+        detailVo.setUser(user);
+        detailVo.setRemain_time(remain_time);
+        detailVo.setSeckill_status(seckill_status);
+
+        return Result.success(detailVo);
     }
 }
