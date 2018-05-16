@@ -43,10 +43,12 @@
                 <span id="seckillTip"></span>
             </td>
             <td>
-                <form id="seckillForm" method="post" action="/goods/do_seckill">
+                <!--<form id="seckillForm" method="post" action="/goods/do_seckill">
                     <button class="btn btn-primary btn-block" type="submit" id="buyButton">立即秒杀</button>
                     <input type="hidden" name="goodsId" id="goodsId" />
-                </form>
+                </form>-->
+                <button class="btn btn-primary btn-block" type="button" id="buyButton" onclick="doSeckill()">立即秒杀</button>
+                <input type="hidden" name="goodsId" id="goodsId" />
             </td>
         </tr>
         <tr>
@@ -65,6 +67,27 @@
 </div>
 </body>
 <script>
+
+    <!-- 秒杀功能 -->
+    function doSeckill(){
+        $.ajax({
+            url:"/goods/static/do_seckill",
+            type:"POST",
+            data:{
+                goodsId:$("#goodsId").val(),
+            },
+            success:function(data){
+                if(data.code == 0){  //秒杀成功了
+                    window.location.href="/order-detail.htm?orderId="+data.data.id;
+                }else{
+                    layer.msg(data.msg);
+                }
+            },
+            error:function(){
+                layer.msg("客户端请求有误");
+            }
+        });
+    }
 
     <!-- 静态化处理 -->
     $(function () {

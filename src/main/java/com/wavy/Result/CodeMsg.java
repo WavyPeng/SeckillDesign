@@ -28,6 +28,8 @@ public class CodeMsg {
     public static CodeMsg SECKILL_REPEAT = new CodeMsg(500301,"不能重复秒杀");
     public static CodeMsg SECKILL_FAIL = new CodeMsg(500302,"秒杀失败");
 
+    //订单模块 5004XX
+    public static CodeMsg ORDER_NOT_EXIST = new CodeMsg(500400,"订单不存在");
 
     private CodeMsg(){
     }

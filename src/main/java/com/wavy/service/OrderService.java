@@ -4,6 +4,8 @@ import com.wavy.dao.OrderDao;
 import com.wavy.entity.OrderInfo;
 import com.wavy.entity.SeckillOrder;
 import com.wavy.entity.User;
+import com.wavy.redis.OrderKey;
+import com.wavy.redis.RedisService;
 import com.wavy.vo.GoodsVo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +20,9 @@ public class OrderService {
     @Autowired
     OrderDao orderDao;
 
+    @Autowired
+    RedisService redisService;
+
     /**
      * 获取秒杀订单
      * @param userId
@@ -25,7 +30,10 @@ public class OrderService {
      * @return
      */
     public SeckillOrder getSeckillOrderByUserIdGoodsId(long userId,long goodsId){
-        return orderDao.getSeckillOrderByUserIdGoodsId(userId,goodsId);
+        //return orderDao.getSeckillOrderByUserIdGoodsId(userId,goodsId);
+        // ---- 优化 ----
+        // 判断是否秒杀到商品时，不直接查数据库，而是查缓存
+        return redisService.get(OrderKey.orderToken,""+userId+"_"+goodsId,SeckillOrder.class);
     }
 
     /**
@@ -56,6 +64,19 @@ public class OrderService {
         seckillOrder.setUserId(user.getId());
         orderDao.insertSeckillOrder(seckillOrder);
 
+        // ---- 优化 ----
+        // 同时将订单信息写入缓存
+        redisService.set(OrderKey.orderToken,""+user.getId()+"_"+goods.getId(),seckillOrder);
+
         return orderInfo;
+    }
+
+    /**
+     * 获取订单信息
+     * @param orderId
+     * @return
+     */
+    public OrderInfo getOrderById(long orderId){
+        return orderDao.getOrderById(orderId);
     }
 }
