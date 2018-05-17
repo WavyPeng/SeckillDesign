@@ -30,7 +30,8 @@ public class RedisService {
      * @param str
      * @return
      */
-    private <T> T stringToBean(String str,Class<T> clazz){
+    @SuppressWarnings("unchecked")
+    public static  <T> T stringToBean(String str,Class<T> clazz){
         if(str == null || str.length()<=0 || clazz == null)
             return null;
         if(clazz == int.class || clazz == Integer.class)
@@ -49,7 +50,7 @@ public class RedisService {
      * @param <T>
      * @return
      */
-    private <T> String beanToString(T value){
+    public static  <T> String beanToString(T value){
         if(value == null)//如果为空
             return null;
         Class<?> clazz = value.getClass();
@@ -185,7 +186,7 @@ public class RedisService {
             jedis =  jedisPool.getResource();
             //生成真正的key
             String realKey  = prefix.getPrefix() + key;
-            long ret =  jedis.del(key);
+            long ret =  jedis.del(realKey);
             return ret > 0;
         }finally {
             returnToPool(jedis);

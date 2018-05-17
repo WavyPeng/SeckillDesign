@@ -76,6 +76,13 @@ public class SeckillController {
         return "order-detail";
     }
 
+    /**
+     * 页面静态化处理秒杀
+     * @param model
+     * @param user
+     * @param goodsId
+     * @return
+     */
     @RequestMapping(value = "/static/do_seckill",method = RequestMethod.POST)
     @ResponseBody
     public Result<OrderInfo> staticForDoSeckill(Model model, User user,
