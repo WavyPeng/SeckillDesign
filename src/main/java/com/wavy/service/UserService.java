@@ -5,7 +5,7 @@ import com.wavy.Result.CodeMsg;
 import com.wavy.dao.UserDao;
 import com.wavy.entity.User;
 import com.wavy.redis.RedisService;
-import com.wavy.redis.UserKey;
+import com.wavy.Prefix.UserKey;
 import com.wavy.utils.MD5Util;
 import com.wavy.utils.UUIDUtil;
 import com.wavy.vo.LoginVo;

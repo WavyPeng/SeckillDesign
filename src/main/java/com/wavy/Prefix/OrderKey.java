@@ -1,4 +1,4 @@
-package com.wavy.redis;
+package com.wavy.Prefix;
 /**
  * OrderKey
  * Created by WavyPeng on 2018/5/16.

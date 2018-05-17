@@ -4,7 +4,7 @@ import com.wavy.dao.OrderDao;
 import com.wavy.entity.OrderInfo;
 import com.wavy.entity.SeckillOrder;
 import com.wavy.entity.User;
-import com.wavy.redis.OrderKey;
+import com.wavy.Prefix.OrderKey;
 import com.wavy.redis.RedisService;
 import com.wavy.vo.GoodsVo;
 import lombok.extern.slf4j.Slf4j;
@@ -55,12 +55,12 @@ public class OrderService {
         orderInfo.setOrderChannel(1);
         orderInfo.setStatus(0);   //订单状态最好使用枚举类型来表示
         orderInfo.setUserId(user.getId());
-        long orderId = orderDao.insertOrder(orderInfo);
 
+        orderDao.insertOrder(orderInfo);
         //创建秒杀订单记录
         SeckillOrder seckillOrder = new SeckillOrder();
         seckillOrder.setGoodsId(goods.getId());
-        seckillOrder.setOrderId(orderId);
+        seckillOrder.setOrderId(orderInfo.getId());
         seckillOrder.setUserId(user.getId());
         orderDao.insertSeckillOrder(seckillOrder);
 

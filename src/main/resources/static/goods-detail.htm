@@ -68,17 +68,57 @@
 </body>
 <script>
 
+    <!-- 轮询秒杀结果 -->
+    function getSeckillResult(goodsId){
+        $.ajax({
+            url:"/goods/rabbitmq/seckill_result",
+            type:"GET",
+            data:{
+                goodsId:$("#goodsId").val(),
+            },
+            success:function(data){
+                if(data.code == 0){
+                    var result = data.data;
+                    if(result < 0){
+                        layer.msg("商品被秒杀完啦~");
+                    }else if(result == 0){ //排队中，继续轮询
+                        setTimeout(function(){
+                            getSeckillResult(goodsId);
+                        }, 50);
+                    }else{  //秒杀成功
+                        console.log("秒杀成功了！！！！！");
+                        layer.confirm("恭喜你，秒杀成功！查看订单？", {btn:["确定","取消"]},
+                            function(){
+                                window.location.href="/order-detail.htm?orderId="+result;
+                            },
+                            function(){
+                                layer.closeAll();
+                        });
+                    }
+                }else{
+                    layer.msg(data.msg);
+                }
+            },
+            error:function () {
+                layer.msg("客户端请求有误");
+            }
+        });
+    }
+
     <!-- 秒杀功能 -->
     function doSeckill(){
         $.ajax({
-            url:"/goods/static/do_seckill",
+//            url:"/goods/static/do_seckill",
+            url:"/goods/rabbitmq/do_seckill",
             type:"POST",
             data:{
                 goodsId:$("#goodsId").val(),
             },
             success:function(data){
-                if(data.code == 0){  //秒杀成功了
-                    window.location.href="/order-detail.htm?orderId="+data.data.id;
+                if(data.code == 0){  // 排队中
+                    // 加入异步下单后，这里要轮询秒杀结果
+                    getSeckillResult($("#goodsId").val());
+//                    window.location.href="/order-detail.htm?orderId="+data.data.id;
                 }else{
                     layer.msg(data.msg);
                 }

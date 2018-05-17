@@ -2,7 +2,7 @@ package com.wavy.controller;
 
 import com.wavy.Result.Result;
 import com.wavy.entity.User;
-import com.wavy.redis.GoodsKey;
+import com.wavy.Prefix.GoodsKey;
 import com.wavy.redis.RedisService;
 import com.wavy.service.GoodsService;
 import com.wavy.service.UserService;

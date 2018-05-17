@@ -1,4 +1,4 @@
-package com.wavy.redis;
+package com.wavy.Prefix;
 
 /**
  * KeyPrefix实现类

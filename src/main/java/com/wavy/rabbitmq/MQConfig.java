@@ -25,6 +25,17 @@ public class MQConfig {
     public static final String FANOUT_EXCHANGE = "fanoutExchange";
     public static final String HEADERS_EXCHANGE = "headerExchange";
     public static final String HEADERS_QUEUE = "header.queue";
+    // 秒杀队列
+    public static final String SECKILL_QUEUE = "seckill.queue";
+
+    /**
+     * seckillQueue 采用Direct模式
+     * @return
+     */
+    @Bean
+    public Queue seckillQueue(){
+        return new Queue(SECKILL_QUEUE,true);
+    }
 
     /**
      * Direct模式 交换机Exchange
@@ -47,6 +58,7 @@ public class MQConfig {
     public Queue topicQueue2(){
         return new Queue(TOPIC_QUEUE_2,true);
     }
+
     // 现将消息放到exchange中，之后exchange再将消息发送给队列
     @Bean
     public TopicExchange topicExchange(){
@@ -89,12 +101,12 @@ public class MQConfig {
      * @return
      */
     @Bean
-    public HeadersExchange headersExchange(){
-        return new HeadersExchange(HEADERS_EXCHANGE);
-    }
-    @Bean
     public Queue headersQueue1(){
         return new Queue(HEADERS_QUEUE,true);
+    }
+    @Bean
+    public HeadersExchange headersExchange(){
+        return new HeadersExchange(HEADERS_EXCHANGE);
     }
     @Bean
     public Binding headerBinding(){

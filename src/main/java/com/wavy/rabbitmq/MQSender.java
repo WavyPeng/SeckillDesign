@@ -1,6 +1,7 @@
 package com.wavy.rabbitmq;
 
-import com.wavy.redis.RedisService;
+import com.wavy.message.SeckillMessage;
+import com.wavy.utils.ConversionUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.amqp.core.Message;
@@ -23,7 +24,7 @@ public class MQSender {
      * @param message
      */
     public void send(Object message){
-        String msg = RedisService.beanToString(message);
+        String msg = ConversionUtil.beanToString(message);
         log.info("send message:{}",msg);
         //指定发送到哪个队列
         amqpTemplate.convertAndSend(MQConfig.QUEUE,msg);
@@ -34,7 +35,7 @@ public class MQSender {
      * @param message
      */
     public void sendTopic(Object message){
-        String msg = RedisService.beanToString(message);
+        String msg = ConversionUtil.beanToString(message);
         log.info("send topic message:{}",msg);
         // queue1和queue2都能收到此消息
         amqpTemplate.convertAndSend(MQConfig.TOPIC_EXCHANGE,MQConfig.ROUTING_KEY_1,msg+"1");
@@ -47,7 +48,7 @@ public class MQSender {
      * @param message
      */
     public void sendFanout(Object message){
-        String msg = RedisService.beanToString(message);
+        String msg = ConversionUtil.beanToString(message);
         log.info("send fanout message:{}",msg);
         amqpTemplate.convertAndSend(MQConfig.FANOUT_EXCHANGE,"",msg);
     }
@@ -57,7 +58,7 @@ public class MQSender {
      * @param message
      */
     public void sendHeader(Object message){
-        String msg = RedisService.beanToString(message);
+        String msg = ConversionUtil.beanToString(message);
         log.info("send header message:{}",msg);
         MessageProperties properties = new MessageProperties();
         // 指定头部信息
@@ -65,5 +66,16 @@ public class MQSender {
         properties.setHeader("header2","value2");
         Message obj = new Message(msg.getBytes(),properties);
         amqpTemplate.convertAndSend(MQConfig.HEADERS_EXCHANGE,"",obj);
+    }
+
+    /**
+     * 发送秒杀消息（采用Direct模式）
+     * @param seckillMessage
+     */
+    public void sendSeckillMessage(SeckillMessage seckillMessage){
+        String msg = ConversionUtil.beanToString(seckillMessage);
+        log.info("send message:{}",msg);
+        //指定发送到哪个队列
+        amqpTemplate.convertAndSend(MQConfig.SECKILL_QUEUE,msg);
     }
 }
