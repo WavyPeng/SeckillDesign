@@ -2,6 +2,7 @@ package com.wavy.controller;
 
 import com.wavy.Result.CodeMsg;
 import com.wavy.Result.Result;
+import com.wavy.annotation.AccessLimit;
 import com.wavy.entity.OrderInfo;
 import com.wavy.entity.SeckillOrder;
 import com.wavy.entity.User;
@@ -21,6 +22,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import javax.imageio.ImageIO;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.awt.image.BufferedImage;
 import java.io.OutputStream;
@@ -228,18 +230,37 @@ public class SeckillController implements InitializingBean{
      * @param goodsId
      * @return
      */
+    @AccessLimit(seconds=5, maxCount=5, needLogin=true)
     @RequestMapping(value = "/seckill/path",method = RequestMethod.GET)
     @ResponseBody
-    public Result<String> getSeckillPath(User user, @RequestParam("goodsId")long goodsId,
-                                         @RequestParam(value = "verifyCode")int verifyCode){
+    public Result<String> getSeckillPath(HttpServletRequest request,User user, @RequestParam("goodsId")long goodsId,
+                                         @RequestParam(value = "verifyCode",defaultValue = "0")int verifyCode){
         if(user == null){
             return Result.error(CodeMsg.SESSION_ERROR);
         }
+
+//        // ----- 限流防刷 -----
+//        // 查询访问次数
+//        String uri = request.getRequestURI();
+//        String key = uri + "_" + user.getId();
+//        Integer count = redisService.get(AccessKey.accessControl,key,Integer.class);
+//        if(count == null){ // 说明首次访问
+//            redisService.set(AccessKey.accessControl,key,1);
+//        }else if(count < 5){
+//            redisService.incr(AccessKey.accessControl,key);
+//        }else{  // 访问超限
+//            return Result.error(CodeMsg.ACCESS_LIMIT_REACHED);
+//        }
+//        // ----- END -----
+
+        // ----- 优化 -----
         // 校验验证码是否正确
         boolean check = seckillService.checkVerifyCode(user,goodsId,verifyCode);
         if(!check){
             return Result.error(CodeMsg.REQUEST_ILLEGAL);
         }
+        // ----- END -----
+
         // 生成秒杀路径
         String path = seckillService.createSeckillPath(user,goodsId);
         return Result.success(path);

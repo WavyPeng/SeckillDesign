@@ -1,6 +1,7 @@
 package com.wavy.config;
 
 import com.wavy.entity.User;
+import com.wavy.interceptor.UserContext;
 import com.wavy.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -54,39 +55,43 @@ public class UserArgumentResolver implements HandlerMethodArgumentResolver {
                                   @Nullable ModelAndViewContainer modelAndViewContainer,
                                   NativeWebRequest nativeWebRequest,
                                   @Nullable WebDataBinderFactory webDataBinderFactory) throws Exception {
-        //获取request和response
-        HttpServletRequest request = nativeWebRequest.getNativeRequest(HttpServletRequest.class);
-        HttpServletResponse response = nativeWebRequest.getNativeResponse(HttpServletResponse.class);
+//        //获取request和response
+//        HttpServletRequest request = nativeWebRequest.getNativeRequest(HttpServletRequest.class);
+//        HttpServletResponse response = nativeWebRequest.getNativeResponse(HttpServletResponse.class);
+//
+//        //获取token
+//        String paramToken = request.getParameter(UserService.COOKIE_NAME);
+//        //获取Cookie中的token
+//        String cookieToken = getCookieValue(request, UserService.COOKIE_NAME);
+//
+//        if(StringUtils.isEmpty(cookieToken) && StringUtils.isEmpty(paramToken)) {
+//            return null;
+//        }
+//        String token = StringUtils.isEmpty(paramToken)?cookieToken:paramToken;
+//
+//        return userService.getByToken(response, token);
 
-        //获取token
-        String paramToken = request.getParameter(UserService.COOKIE_NAME);
-        //获取Cookie中的token
-        String cookieToken = getCookieValue(request, UserService.COOKIE_NAME);
-
-        if(StringUtils.isEmpty(cookieToken) && StringUtils.isEmpty(paramToken)) {
-            return null;
-        }
-        String token = StringUtils.isEmpty(paramToken)?cookieToken:paramToken;
-
-        return userService.getByToken(response, token);
+        // ----- 优化 -----
+        // 由于拦截器是先执行的，这里是后执行的，所以可以直接取到之前的值
+        return UserContext.getUser();
     }
 
-    /**
-     * 从Cookie中获取目标值
-     * @param request
-     * @param cookiName
-     * @return
-     */
-    private String getCookieValue(HttpServletRequest request, String cookiName) {
-        Cookie[]  cookies = request.getCookies();
-        if(cookies == null || cookies.length <= 0){
-            return null;
-        }
-        for(Cookie cookie : cookies) {
-            if(cookie.getName().equals(cookiName)) {
-                return cookie.getValue();
-            }
-        }
-        return null;
-    }
+//    /**
+//     * 从Cookie中获取目标值
+//     * @param request
+//     * @param cookiName
+//     * @return
+//     */
+//    private String getCookieValue(HttpServletRequest request, String cookiName) {
+//        Cookie[]  cookies = request.getCookies();
+//        if(cookies == null || cookies.length <= 0){
+//            return null;
+//        }
+//        for(Cookie cookie : cookies) {
+//            if(cookie.getName().equals(cookiName)) {
+//                return cookie.getValue();
+//            }
+//        }
+//        return null;
+//    }
 }
