@@ -10,4 +10,6 @@ public class SeckillKey extends BasePrefix{
     }
 
     public static SeckillKey getSeckillPath = new SeckillKey(60,"seckill_path_");
+    public static SeckillKey getSeckillVerifyCode = new SeckillKey(300,"seckill_verifyCode_");
+
 }

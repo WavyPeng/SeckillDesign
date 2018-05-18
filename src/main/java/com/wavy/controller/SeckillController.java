@@ -20,6 +20,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import javax.imageio.ImageIO;
+import javax.servlet.http.HttpServletResponse;
+import java.awt.image.BufferedImage;
+import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -219,21 +223,53 @@ public class SeckillController implements InitializingBean{
     }
 
     /**
-     * 生成秒杀接口
+     * 生成秒杀路径接口
      * @param user
      * @param goodsId
      * @return
      */
     @RequestMapping(value = "/seckill/path",method = RequestMethod.GET)
     @ResponseBody
-    public Result<String> getSeckillPath(User user, @RequestParam("goodsId")long goodsId){
+    public Result<String> getSeckillPath(User user, @RequestParam("goodsId")long goodsId,
+                                         @RequestParam(value = "verifyCode")int verifyCode){
         if(user == null){
             return Result.error(CodeMsg.SESSION_ERROR);
         }
-
+        // 校验验证码是否正确
+        boolean check = seckillService.checkVerifyCode(user,goodsId,verifyCode);
+        if(!check){
+            return Result.error(CodeMsg.REQUEST_ILLEGAL);
+        }
         // 生成秒杀路径
         String path = seckillService.createSeckillPath(user,goodsId);
         return Result.success(path);
     }
 
+    /**
+     * 生成数学公式验证码
+     * @param response
+     * @param user
+     * @param goodsId
+     * @return
+     */
+    @RequestMapping(value = "/seckill/verifyCode",method = RequestMethod.GET)
+    @ResponseBody
+    public Result<String> getVerifyCodeForSeckill(HttpServletResponse response, User user,
+                                                  @RequestParam("goodsId")long goodsId){
+        if(user == null){
+            return Result.error(CodeMsg.SESSION_ERROR);
+        }
+        try{
+            BufferedImage image  = seckillService.createVerifyCode(user, goodsId);
+            // 将图片写入输出流
+            OutputStream out = response.getOutputStream();
+            ImageIO.write(image, "JPEG", out);
+            out.flush();
+            out.close();
+            return null;
+        }catch (Exception e){
+            e.printStackTrace();
+            return Result.error(CodeMsg.SECKILL_FAIL);
+        }
+    }
 }
