@@ -1,10 +1,13 @@
 package com.wavy.service;
 
+import com.wavy.Prefix.SeckillKey;
 import com.wavy.entity.OrderInfo;
 import com.wavy.entity.SeckillOrder;
 import com.wavy.entity.User;
 import com.wavy.Prefix.GoodsKey;
 import com.wavy.redis.RedisService;
+import com.wavy.utils.MD5Util;
+import com.wavy.utils.UUIDUtil;
 import com.wavy.vo.GoodsVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -79,4 +82,33 @@ public class SeckillService {
         return redisService.exists(GoodsKey.isGoodsOver,""+goodsId);
     }
 
+    /**
+     * 生成秒杀路径
+     * @param user
+     * @param goodsId
+     * @return path
+     */
+    public String createSeckillPath(User user,long goodsId){
+        if(user == null || goodsId<=0){
+            return null;
+        }
+        String path = MD5Util.md5(UUIDUtil.uuid()+"123456");
+        redisService.set(SeckillKey.getSeckillPath,""+user.getId()+"_"+goodsId,path);
+        return path;
+    }
+
+    /**
+     * 校验秒杀路径
+     * @param path
+     * @param user
+     * @param goodsId
+     * @return
+     */
+    public boolean checkPath(String path,User user,long goodsId){
+        if(path == null || user == null){
+            return false;
+        }
+        String oldPath = redisService.get(SeckillKey.getSeckillPath,""+user.getId()+"_"+goodsId,String.class);
+        return path.equals(oldPath);
+    }
 }

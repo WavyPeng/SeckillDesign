@@ -18,10 +18,7 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.List;
@@ -135,14 +132,23 @@ public class SeckillController implements InitializingBean{
      * @param goodsId
      * @return
      */
-    @RequestMapping(value = "/rabbitmq/do_seckill",method = RequestMethod.POST)
+    @RequestMapping(value = "/rabbitmq/{path}/do_seckill",method = RequestMethod.POST)
     @ResponseBody
     public Result<Integer> rabbitmqForDoSeckill(Model model, User user,
-                                                @RequestParam("goodsId")long goodsId){
+                                                @RequestParam("goodsId")long goodsId,
+                                                @PathVariable("path") String path){
         model.addAttribute("user",user);
         if(user == null){
             return Result.error(CodeMsg.SESSION_ERROR);
         }
+
+        // ----- 安全优化 -----
+        // 判断秒杀路径
+        boolean check = seckillService.checkPath(path,user,goodsId);
+        if(!check){
+            return Result.error(CodeMsg.REQUEST_ILLEGAL);
+        }
+        // ------ END ------
 
         // ------ 优化 ------
         // 判断商品秒杀状态
@@ -181,7 +187,7 @@ public class SeckillController implements InitializingBean{
     @RequestMapping(value = "/rabbitmq/seckill_result",method = RequestMethod.GET)
     @ResponseBody
     public Result<Long> seckillResult(Model model, User user,
-                                         @RequestParam("goodsId")long goodsId){
+                                      @RequestParam("goodsId")long goodsId){
         model.addAttribute("user",user);
         if(user == null){
             return Result.error(CodeMsg.SESSION_ERROR);
@@ -211,4 +217,23 @@ public class SeckillController implements InitializingBean{
             localOverMap.put(goods.getId(),false);
         }
     }
+
+    /**
+     * 生成秒杀接口
+     * @param user
+     * @param goodsId
+     * @return
+     */
+    @RequestMapping(value = "/seckill/path",method = RequestMethod.GET)
+    @ResponseBody
+    public Result<String> getSeckillPath(User user, @RequestParam("goodsId")long goodsId){
+        if(user == null){
+            return Result.error(CodeMsg.SESSION_ERROR);
+        }
+
+        // 生成秒杀路径
+        String path = seckillService.createSeckillPath(user,goodsId);
+        return Result.success(path);
+    }
+
 }

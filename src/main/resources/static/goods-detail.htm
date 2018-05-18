@@ -47,7 +47,7 @@
                     <button class="btn btn-primary btn-block" type="submit" id="buyButton">立即秒杀</button>
                     <input type="hidden" name="goodsId" id="goodsId" />
                 </form>-->
-                <button class="btn btn-primary btn-block" type="button" id="buyButton" onclick="doSeckill()">立即秒杀</button>
+                <button class="btn btn-primary btn-block" type="button" id="buyButton" onclick="getSeckillPath()">立即秒杀</button>
                 <input type="hidden" name="goodsId" id="goodsId" />
             </td>
         </tr>
@@ -68,6 +68,28 @@
 </body>
 <script>
 
+    <!-- 获取秒杀接口地址 -->
+    function getSeckillPath(){
+        $.ajax({
+            url:"/goods/seckill/path",
+            type:"GET",
+            data:{
+                goodsId:$("#goodsId").val(),
+            },
+            success:function(data){
+                if(data.code == 0){
+                    var path = data.data;  // 获取秒杀路径
+                    doSeckill(path);           // 执行秒杀
+                }else{
+                    layer.msg(data.msg);
+                }
+            },
+            error:function () {
+                layer.msg("客户端请求有误");
+            }
+        });
+    }
+
     <!-- 轮询秒杀结果 -->
     function getSeckillResult(goodsId){
         $.ajax({
@@ -84,7 +106,7 @@
                     }else if(result == 0){ //排队中，继续轮询
                         setTimeout(function(){
                             getSeckillResult(goodsId);
-                        }, 50);
+                        }, 200);
                     }else{  //秒杀成功
                         console.log("秒杀成功了！！！！！");
                         layer.confirm("恭喜你，秒杀成功！查看订单？", {btn:["确定","取消"]},
@@ -106,10 +128,10 @@
     }
 
     <!-- 秒杀功能 -->
-    function doSeckill(){
+    function doSeckill(path){
         $.ajax({
 //            url:"/goods/static/do_seckill",
-            url:"/goods/rabbitmq/do_seckill",
+            url:"/goods/rabbitmq/"+path+"/do_seckill",
             type:"POST",
             data:{
                 goodsId:$("#goodsId").val(),

@@ -12,7 +12,7 @@ public class MD5Util {
     //定义salt值
     private static final String SALT = "w2a0v1y8";
 
-    private static String md5(String str){
+    public static String md5(String str){
         return DigestUtils.md5Hex(str);
     }
 
