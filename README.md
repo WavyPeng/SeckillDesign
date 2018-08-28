@@ -272,5 +272,5 @@ JDK1.8
 - 中间件：RabbitMQ、Redis
 
 ### 项目结构
-
+![项目结构](https://github.com/WavyPeng/SeckillDesign/blob/master/src/main/resources/images/%E9%A1%B9%E7%9B%AE%E7%BB%93%E6%9E%84.jpg)
 
