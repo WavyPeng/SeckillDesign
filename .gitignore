@@ -12,10 +12,13 @@
 
 ### IntelliJ IDEA ###
 .idea/
+.mvn/
 /idea/
 *ipr
 *iml
 *iws
+mvnw
+mvnw.cmd
 
 ### NetBeans ###
 /nbproject/private/
@@ -52,3 +55,5 @@ target/
 #system ignore
 .DS_Store
 Thumbs.db
+
+
